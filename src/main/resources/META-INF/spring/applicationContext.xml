@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<!--
+	<bean id="appPropsInitService" class="com.fireduptech.cams.service.AppPropertiesInitialisationService" >
+		<constructor-arg index="0" value="META-INF/config/appConfig.properties" />
+	</bean>
+	-->
+
+	<bean id="appPropertiesChecker" class="com.fireduptech.cams.service.AppPropertiesChecker" >
+		<constructor-arg index="0" value="META-INF/config/appConfig.properties" />
+	</bean>
+
+
+
+	<bean id="authenticateClientService" class="com.fireduptech.cams.service.AuthenticateClientService" >
+		<property name="httpClientService" ref="httpClientService" />
+	</bean>
+
+	<bean id="httpClientService" class="com.fireduptech.cams.service.HttpClientService" >
+	</bean>
+
+</beans>
+
