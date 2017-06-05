@@ -58,20 +58,20 @@
 
   </dependencies>
 
-<!--
+
   <scm>
-    <connection>scm:git:git@github.com:mccarthyr/PIMPS_standalone.git</connection>
-    <url>scm:git:git@github.com:mccarthyr/PIMPS_standalone.git</url>
-    <developerConnection>scm:git:git@github.com:mccarthyr/PIMPS_standalone.git</developerConnection>
+    <connection>scm:git:git@github.com:mccarthyr/CAMS.git</connection>
+    <url>scm:git:git@github.com:mccarthyr/CAMS.git</url>
+    <developerConnection>scm:git:git@github.com:mccarthyr/CAMS.git</developerConnection>
     <tag>v1.0</tag>
   </scm>
--->
+
 
   <build>
 
     <plugins>
 
-    <!--
+    
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -91,24 +91,24 @@
          <artifactId>site-maven-plugin</artifactId>
          <version>0.12</version>
          <configuration>
-              @@@ PUT COMMAND HERE git commit message 
+              <!-- git commit message -->
               <message>Maven artifacts for ${project.version}</message>
-              @@@ PUT COMMAND HERE disable webpage processing 
+              <!-- disable webpage processing -->
               <noJekyll>true</noJekyll>
-              @@@ PUT COMMAND HERE matches distribution management repository url above 
+              <!-- matches distribution management repository url above -->
               <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
-              @@@ PUT COMMAND HERE remote branch name 
+              <!-- remote branch name -->
               <branch>refs/heads/mvn-repo</branch>
-              @@@ PUT COMMAND HERE If you remove this then the old artifact will be removed and new 
+              <!-- If you remove this then the old artifact will be removed and new 
                one will replace. But with the merge tag you can just release by changing 
-                                                the version 
+                                                the version -->
               <merge>true</merge>
               <includes>
                 <include>**/*</include>
                 </includes>
-                @@@ PUT COMMAND HERE github repo name 
-                <repositoryName>PIMPS_standalone</repositoryName>
-                @@@ PUT COMMAND HERE github username 
+                <!-- github repo name -->
+                <repositoryName>CAMS</repositoryName>
+                <!-- github username -->
                 <repositoryOwner>mccarthyr</repositoryOwner>
           </configuration>
           <executions>
@@ -121,7 +121,7 @@
           </executions>
       </plugin>
 
-    -->
+    
 
 
 
