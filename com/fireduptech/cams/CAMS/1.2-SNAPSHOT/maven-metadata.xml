@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.fireduptech.cams</groupId>
+  <artifactId>CAMS</artifactId>
+  <version>1.2-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20170605.194528</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <lastUpdated>20170605194528</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.2-20170605.194528-1</value>
+        <updated>20170605194528</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.2-20170605.194528-1</value>
+        <updated>20170605194528</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>jar-with-dependencies</classifier>
+        <extension>jar</extension>
+        <value>1.2-20170605.194528-1</value>
+        <updated>20170605194528</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
