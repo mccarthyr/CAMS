@@ -1,7 +1,22 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
+	<context:property-placeholder location="classpath*:META-INF/config/database.properties" />
+
+	<context:component-scan base-package="com.fireduptech.cams" />
+
+	<jpa:repositories base-package="com.fireduptech.cams" />
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" >
+		<constructor-arg ref="entityManagerFactory" />
+	</bean>
 
 	<!--
 	<bean id="appPropsInitService" class="com.fireduptech.cams.service.AppPropertiesInitialisationService" >
@@ -22,5 +37,60 @@
 	<bean id="httpClientService" class="com.fireduptech.cams.service.HttpClientService" >
 	</bean>
 
+
+
+	<!-- Configuring a Data Source -->
+	<!-- org.apache.commons.dbcp2.BasicDataSource -->
+	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+		<property name="driverClassName" value="${database.driverClassName}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+	</bean> -->
+
+	<!-- If using: commons-dbcp2 then can use below definition otherwise if using
+	   	 commons-dbcp then use the above commented out definition -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close" >
+		<property name="driverClassName" value="${database.driverClassName}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+
+	<!-- This is the configuration for the Spring JDBC Template -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+ <!--
+ 	JDBCTemplate calss takes care of managing Connection, Statement and ResultSet objects,
+ 	catching JDBC exceptions and performing batch operations etc.
+ -->
+
+ <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" >
+ 	<property name="dataSource" ref="dataSource" />
+ 	<property name="packagesToScan" value="com.fireduptech.cams" />
+ 	<property name="jpaVendorAdapter" ref="hibernateVendorAdapter" />
+ 	<property name="jpaProperties" ref="props" />
+ </bean>
+
+ <bean id="hibernateVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+
+ <util:properties id="props" >
+ 	<prop key="hibernate_show_sql">true</prop>
+ 	<prop key="hibernate.id.new_generator_mappings">false</prop>
+ </util:properties>
+
 </beans>
+
+
+
+
+
+
+
+
+
+
 

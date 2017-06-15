@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.springframework.context.ConfigurableApplicationContext;
+//import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
 /*
@@ -24,20 +25,33 @@ import java.util.Set;
 import java.util.Iterator;
 */
 
+
+import org.springframework.core.io.ClassPathResource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+import java.io.InputStream;
+
+import java.util.Properties;
+
+
 import com.fireduptech.cams.Constants;
 
 //import com.fireduptech.cams.service.AppPropertiesInitialisationService;
 import com.fireduptech.cams.service.AppPropertiesChecker;
 import com.fireduptech.cams.service.AuthenticateClientService;
 
-
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.InputStream;
-
-import java.util.Properties;
-
 import com.fireduptech.cams.domain.StravaAthlete;
+
+
+import com.fireduptech.cams.domain.User;
+import com.fireduptech.cams.dao.JDBCTemplateUserDaoImpl;
+import com.fireduptech.cams.dao.JDBCTemplateUserDao;
+
+import com.fireduptech.cams.repository.UserRepository;
+import com.fireduptech.cams.service.UserService;
+
 
 
 /**
@@ -61,7 +75,10 @@ public class App
 	private static boolean requestURIVariableSubstitution = false;
 
 
-    public static void main( String[] args ) throws IOException
+    @Autowired
+    private UserRepository userRepository;
+
+    public static void main( String[] args ) throws IOException, Exception
     {
 
         /**
@@ -81,8 +98,64 @@ public class App
         ApplicationContext context = new ClassPathXmlApplicationContext(
             "classpath:META-INF/spring/applicationContext.xml");
 
-        /*ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
-            "classpath:META-INF/spring/applicationContext.xml");*/
+        //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+          //  "classpath:META-INF/spring/applicationContext.xml");
+
+
+        //ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+          //  "classpath:META-INF/spring/applicationContext.xml");
+
+        
+        // *** TEMP SECTION TESTING OUT NEW JDBC-TEMPLATE FUNCTIONALITY ***
+        
+        // JDBCTemplateUserDao jdbcTemplate = context.getBean(JDBCTemplateUserDao.class);  - You can call it this way without needing a cast
+        JDBCTemplateUserDao jdbcTemplate = (JDBCTemplateUserDao) context.getBean("jdbcTemplateUserDao");
+        
+        User user =  jdbcTemplate.findUserById( 1 );
+
+        System.out.println( user );
+
+        System.out.format( "%n%n" );
+
+        
+        System.out.println("Adding a new User to the database...%n%n");
+
+        User newUser = new User();
+        newUser.setEmail( "richard@newuser.com" );
+        newUser.setToken( "1234abcdefg" );
+
+        int newUserId = jdbcTemplate.insertUser( newUser );
+        
+        System.out.println("The New User ID is: " + newUserId);        
+        System.out.format( "%n%n" );
+        
+
+        // @TODO - FOR LATER ON COULD LOOK TO USE TRANSACTION MANAGEMENT BUT THIS IS NOT NECESSARY IN THE FIRST VERSION PROTOTYPE...
+
+
+        // JPA Example 1 - Get an Existing User  ->@@@ NOTE @@@<- Normally would call the REPOSITORY through A SERVICE class...
+
+        //User existingUser = userRepository.findOne( 2 );
+        UserService userService = (UserService)context.getBean("userService");
+        User existingUser = userService.getUser( 2 );
+
+        System.out.println( "---> The JPA retrieved Existing User is: " );
+        System.out.println( existingUser );
+        System.out.format( "%n%n" );
+
+
+        // JPA Example 2 - Insert a New User
+        User newJpaUser = new User();
+        newJpaUser.setEmail( "richard@hotmail.com" );
+        newJpaUser.setToken( "abcdefg987654321" );
+
+        int newJpaUserId = userService.createUser( newJpaUser );
+        System.out.println("---> The New JPA User ID is: " + newJpaUserId);
+        System.out.format( "%n%n" );
+
+
+        System.exit(0);
+
 
         //AppPropertiesInitialisationService appProp = (AppPropertiesInitialisationService) context.getBean("appPropsInitService");
 
@@ -95,11 +168,6 @@ public class App
         System.out.format( "%n%n" );
 
 
-/** 
- * @TODO ===> NOTE NOTE NOTE <===
- * GO THROUGH ATHELETE STATS CONTROLLER IN PIMPS TO SEE ABOUT USING THE 
- * requestDataFromStravaAPI() METHOD AND FINISH DEVELOPING IT FOR USE IN CAMS...
-*/
 
         
 
@@ -203,6 +271,7 @@ public class App
     	//System.exit(0);
 
     }	// End of the static void main() method...
+
 
 
 
