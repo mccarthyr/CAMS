@@ -102,6 +102,37 @@
         <version>5.2.10.Final</version>
     </dependency>
 
+
+    <!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker -->
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-broker</artifactId>
+        <version>5.14.5</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-kahadb-store -->
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-kahadb-store</artifactId>
+        <version>5.14.5</version>
+        <!-- <scope>test</scope> -->
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-spring -->
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-spring</artifactId>
+        <version>5.14.5</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-jms -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jms</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
     
 
   </dependencies>

@@ -4,7 +4,8 @@
 	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:tx="http://www.springframework.org/schema/tx"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 	<context:property-placeholder location="classpath*:META-INF/config/database.properties" />
 
@@ -12,11 +13,49 @@
 
 	<jpa:repositories base-package="com.fireduptech.cams" />
 
-	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- <tx:annotation-driven transaction-manager="transactionManager" /> -->
+
+	<tx:annotation-driven />
+
+	<bean id="jmsTxManager" class="org.springframework.jms.connection.JmsTransactionManager" >
+		<property name="connectionFactory" ref="cachingConnectionFactory" />
+	</bean>
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" >
 		<constructor-arg ref="entityManagerFactory" />
 	</bean>
+
+	<!-- AMQ Broker for configuring embedded ActiveMQ broker called localhost -->
+	<amq:broker>
+		<amq:transportConnectors>
+			<amq:transportConnector uri="tcp://localhost:61616" />
+		</amq:transportConnectors>
+	</amq:broker>
+
+	<!-- Configuring JMS ConnectionFactory -->
+	<amq:connectionFactory brokerURL="vm://localhost" id="jmsFactory" >
+		<amq:trustedPackages>
+			<value>com.fireduptech.cams.domain</value>
+		</amq:trustedPackages>
+	</amq:connectionFactory>
+
+	<!-- Configuring Spring's CachingConnectionFactory, which is an adapter for the JMS ConnectionFactory.
+       For caching instances of JMS Session, MessageProducer and MessageConsumer -->
+	<bean class="org.springframework.jms.connection.CachingConnectionFactory" id="cachingConnectionFactory" >
+		<property name="targetConnectionFactory" ref="jmsFactory" />
+	</bean>
+
+	<!-- Configuring JmsTemplate - provides layer of abstraction over JMS API -->
+	<bean class="org.springframework.jms.core.JmsTemplate" id="jmsTemplate" >
+		<property name="connectionFactory" ref="cachingConnectionFactory" />
+		<property name="defaultDestination" ref="watchlistDataDestination" />
+	</bean>
+
+	<!-- Configuring the AMQ Queue Destination -->
+	<amq:queue id="watchlistDataDestination" physicalName="monitoredDataQueueDestination" />
+
+
+
 
 	<!--
 	<bean id="appPropsInitService" class="com.fireduptech.cams.service.AppPropertiesInitialisationService" >
