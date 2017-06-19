@@ -51,7 +51,7 @@ import com.fireduptech.cams.dao.JDBCTemplateUserDao;
 
 import com.fireduptech.cams.repository.UserRepository;
 import com.fireduptech.cams.service.UserService;
-
+import com.fireduptech.cams.service.MonitorService;
 
 
 /**
@@ -98,6 +98,8 @@ public class App
         ApplicationContext context = new ClassPathXmlApplicationContext(
             "classpath:META-INF/spring/applicationContext.xml");
 
+
+
         //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
           //  "classpath:META-INF/spring/applicationContext.xml");
 
@@ -109,7 +111,7 @@ public class App
         // *** TEMP SECTION TESTING OUT NEW JDBC-TEMPLATE FUNCTIONALITY ***
         
         // JDBCTemplateUserDao jdbcTemplate = context.getBean(JDBCTemplateUserDao.class);  - You can call it this way without needing a cast
-        JDBCTemplateUserDao jdbcTemplate = (JDBCTemplateUserDao) context.getBean("jdbcTemplateUserDao");
+        /*JDBCTemplateUserDao jdbcTemplate = (JDBCTemplateUserDao) context.getBean("jdbcTemplateUserDao");
         
         User user =  jdbcTemplate.findUserById( 1 );
 
@@ -128,6 +130,7 @@ public class App
         
         System.out.println("The New User ID is: " + newUserId);        
         System.out.format( "%n%n" );
+        */
         
 
         // @TODO - FOR LATER ON COULD LOOK TO USE TRANSACTION MANAGEMENT BUT THIS IS NOT NECESSARY IN THE FIRST VERSION PROTOTYPE...
@@ -136,7 +139,7 @@ public class App
         // JPA Example 1 - Get an Existing User  ->@@@ NOTE @@@<- Normally would call the REPOSITORY through A SERVICE class...
 
         //User existingUser = userRepository.findOne( 2 );
-        UserService userService = (UserService)context.getBean("userService");
+        /*UserService userService = (UserService)context.getBean("userService");
         User existingUser = userService.getUser( 2 );
 
         System.out.println( "---> The JPA retrieved Existing User is: " );
@@ -152,7 +155,29 @@ public class App
         int newJpaUserId = userService.createUser( newJpaUser );
         System.out.println("---> The New JPA User ID is: " + newJpaUserId);
         System.out.format( "%n%n" );
+        */
 
+        // ****** ->ACTIVEMQ<- EMBEDDED BROKER TEMPORARY SECTION - TESTING OUT QUEUES & MESSAGING ******
+        /*
+         * This is hardcoded with a value that exceeds a threshold - normally CRON run to get value and check...
+         * A TextMessage is sent to the ActiveMQ Queue called watchlistDataDestination.
+         * The idea is that then once that is sent that a Listener will receive an update which will just
+         * send the updated message to the command line for this version. So everything is contained within 
+         * one programme for this very basic version of it.
+         */
+
+
+        // Setting the exceeded threshold value that is being monitored
+        String totalDistance = "213";  // JUST SETTING IT AS A STRING SO CAN SEND IN JMS TEXTMESSAGE TO QUEUE FOR NOW...
+
+        // Call the Service that sends the value to the Queue - FOR NOW JUST CREATE A CLASS CALLED MonitorService
+        MonitorService monitorService = (MonitorService)context.getBean("monitorService");
+        monitorService.createQueueEntryForWatchlistData( totalDistance );
+
+        
+        Thread.sleep(5000); // Just to give time for the Asynchronous message listener to execute before programme exit...
+
+        System.out.format( "%n%n" );
 
         System.exit(0);
 
