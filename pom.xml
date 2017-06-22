@@ -3,7 +3,7 @@
   <groupId>com.fireduptech.cams</groupId>
   <artifactId>CAMS</artifactId>
   <packaging>jar</packaging>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4</version>
   <name>CAMS</name>
   <url>http://maven.apache.org</url>
 
@@ -178,7 +178,7 @@
     <connection>scm:git:git@github.com:mccarthyr/CAMS.git</connection>
     <url>scm:git:git@github.com:mccarthyr/CAMS.git</url>
     <developerConnection>scm:git:git@github.com:mccarthyr/CAMS.git</developerConnection>
-    <tag>v1.0</tag>
+    <tag>v1.05</tag>
   </scm>
 
 
