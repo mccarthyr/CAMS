@@ -6,9 +6,14 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:amq="http://activemq.apache.org/schema/core"
 	xmlns:jms="http://www.springframework.org/schema/jms"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-	<context:property-placeholder location="classpath*:META-INF/config/database.properties" />
+	<task:annotation-driven />
+
+
+	<!--<context:property-placeholder location="classpath*:META-INF/config/database.properties" />-->
+	<context:property-placeholder location="classpath*:META-INF/config/*.properties" />
 
 	<context:component-scan base-package="com.fireduptech.cams" />
 
@@ -63,6 +68,42 @@
    
    <bean class="com.fireduptech.cams.jms.MonitorServiceMessageListener" id="monitorServiceMessageListener" > 
    </bean>
+
+
+   <!-- Configuring ThreadPoolExecutor - Explicit definition rather than using <executor> element of 
+        Spring's task schema -->
+   <bean id="myTaskExecutor"  class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" >
+   	<property name="corePoolSize" value="5" />
+   	<property name="maxPoolSize" value="10" />
+   	<property name="queueCapacity" value="15" />
+   	<property name="rejectedExecutionHandler" ref="abortPolicy" />
+   </bean>
+
+   <bean id="abortPolicy" class="java.util.concurrent.ThreadPoolExecutor.AbortPolicy" />
+
+
+   <!-- Configuring Email Sending -->
+   <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl" >
+   	<property name="host" value="${email.host}" />
+   	<property name="protocol" value="${email.protocol}" />
+   	<property name="port" value="${email.port}" />
+   	<property name="username" value="${email.username}" />
+   	<property name="password" value="${email.password}" />
+   	<property name="javaMailProperties">
+   		<props>
+   			<prop key="mail.smtp.auth">true</prop>
+   			<prop key="mail.smtp.starttls.enable">true</prop>
+   		</props>
+   	</property> 
+   </bean>
+
+   <!-- SimpleMailMessage configuration -->
+   <bean id="athleteDataThresholdReachedTemplate" class="org.springframework.mail.SimpleMailMessage" >
+   	<property name="subject" value="${email.subject.data.threshold.reached}" />
+   	<property name="text" value="${email.text.data.threshold.reached}" />
+   </bean>
+
+
 
 
 	<!--

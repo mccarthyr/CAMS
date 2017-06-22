@@ -53,6 +53,14 @@ import com.fireduptech.cams.repository.UserRepository;
 import com.fireduptech.cams.service.UserService;
 import com.fireduptech.cams.service.MonitorService;
 
+import com.fireduptech.cams.thread.SampleThreadExecutor;
+import com.fireduptech.cams.thread.PrintTask;
+
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.*;
+
+import java.util.concurrent.Future;
+
 
 /**
  *  ---> APPLICATION PROTOTYPE FEATURE TO-DO ITEMS <---
@@ -166,16 +174,81 @@ public class App
          * one programme for this very basic version of it.
          */
 
-
         // Setting the exceeded threshold value that is being monitored
+        
         String totalDistance = "213";  // JUST SETTING IT AS A STRING SO CAN SEND IN JMS TEXTMESSAGE TO QUEUE FOR NOW...
 
         // Call the Service that sends the value to the Queue - FOR NOW JUST CREATE A CLASS CALLED MonitorService
         MonitorService monitorService = (MonitorService)context.getBean("monitorService");
         monitorService.createQueueEntryForWatchlistData( totalDistance );
 
+        Thread.sleep(10000);
+        System.out.format( "%n%n" );
+        System.exit(0);
+
+
+        System.out.println("***Just BEFORE calling Future method...");
+
+        Future future = monitorService.testFuture();
+
+        System.out.println("***Just AFTER calling Future method...");
+
+
+        while (true) {
+            if ( future.isDone() ) {
+                String futureMessage = (String)future.get();
+                System.out.println("...and the Future message is: " + futureMessage);
+                break;
+            } else {
+                System.out.println("Still waiting on the Future message to arrive...");
+                Thread.sleep(1000);
+            }
+        }
+
+
+        //String futureMessage = (String)future.get();
+        //System.out.println("...and the Future message is: " + futureMessage);
+
+
+        System.out.format( "%n%n" );
+        System.exit(0);
+
+
+        // ****** -> TASK EXECUTOR <- LATER THIS WILL BE USED FOR ONE OFF ADD ENTRY ASYNCHONOUSLY TO STRAVA ******
+        SampleThreadExecutor sampleThreadExecutor = (SampleThreadExecutor)context.getBean("sampleThreadExecutor");
+        //ThreadPoolTaskExecutor sampleThreadExecutor = (ThreadPoolTaskExecutor)context.getBean("myTaskExecutor");
+        // ThreadPoolTaskExecutor
+        // myTaskExecutor
+
+        // Create the Runnable task
+        sampleThreadExecutor.executeTask( new PrintTask( "Thread1" ) );
+        //sampleThreadExecutor.execute( new PrintTask( "Thread1" ) );
+        sampleThreadExecutor.executeTask( new PrintTask( "Thread2" ) );
+        //sampleThreadExecutor.execute( new PrintTask( "Thread2" ) );
+
+
+        // Keep the App going onto the Thread running are finished
+        for (;;) {
+            int count = sampleThreadExecutor.getNumberOfActiveThreads();
+            //int count = sampleThreadExecutor.getActiveCount();
+            System.out.println( "The number is Active Threads is: " + count );
+            try {
+                Thread.sleep(1000);
+            } catch ( InterruptedException ie ) {
+                ie.printStackTrace();
+            }
+            if ( count == 0 ) {
+                sampleThreadExecutor.shutDownTaskExecutor();
+                //sampleThreadExecutor.shutdown();
+                break;
+            }
+
+        }
+
+
+
         
-        Thread.sleep(5000); // Just to give time for the Asynchronous message listener to execute before programme exit...
+        //Thread.sleep(5000); // Just to give time for the Asynchronous message listener to execute before programme exit...
 
         System.out.format( "%n%n" );
 

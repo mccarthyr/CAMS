@@ -15,6 +15,12 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 
+import java.util.concurrent.Future;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+
+
+
 @Service(value="monitorService")
 public class MonitorService {
 
@@ -39,6 +45,16 @@ public class MonitorService {
 
 
 	}	// End of method createQueueEntryForWatchlistData()...	
+
+
+	@Async
+	public Future<String> testFuture() throws InterruptedException {
+
+		Thread.sleep(5000);
+		return new AsyncResult<String>("---> Hello from the Future Method...");
+
+	}
+
 
 
 
