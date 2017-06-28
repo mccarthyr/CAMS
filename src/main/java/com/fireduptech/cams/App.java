@@ -39,8 +39,11 @@ import java.util.Properties;
 import com.fireduptech.cams.Constants;
 
 //import com.fireduptech.cams.service.AppPropertiesInitialisationService;
+
+
 import com.fireduptech.cams.service.AppPropertiesChecker;
 import com.fireduptech.cams.service.AuthenticateClientService;
+
 
 import com.fireduptech.cams.domain.StravaAthlete;
 
@@ -49,9 +52,11 @@ import com.fireduptech.cams.domain.User;
 import com.fireduptech.cams.dao.JDBCTemplateUserDaoImpl;
 import com.fireduptech.cams.dao.JDBCTemplateUserDao;
 
+
 import com.fireduptech.cams.repository.UserRepository;
 import com.fireduptech.cams.service.UserService;
 import com.fireduptech.cams.service.MonitorService;
+
 
 import com.fireduptech.cams.thread.SampleThreadExecutor;
 import com.fireduptech.cams.thread.PrintTask;
@@ -60,6 +65,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.*;
 
 import java.util.concurrent.Future;
+
 
 
 /**
@@ -83,8 +89,8 @@ public class App
 	private static boolean requestURIVariableSubstitution = false;
 
 
-    @Autowired
-    private UserRepository userRepository;
+   // @Autowired
+   // private UserRepository userRepository;
 
     public static void main( String[] args ) throws IOException, Exception
     {
@@ -103,8 +109,8 @@ public class App
         */
 
 
-        ApplicationContext context = new ClassPathXmlApplicationContext(
-            "classpath:META-INF/spring/applicationContext.xml");
+        //ApplicationContext context = new ClassPathXmlApplicationContext(
+          //  "classpath:META-INF/spring/applicationContext.xml");
 
 
 
@@ -112,8 +118,8 @@ public class App
           //  "classpath:META-INF/spring/applicationContext.xml");
 
 
-        //ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
-          //  "classpath:META-INF/spring/applicationContext.xml");
+        ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+            "classpath:META-INF/spring/applicationContext.xml");
 
         
         // *** TEMP SECTION TESTING OUT NEW JDBC-TEMPLATE FUNCTIONALITY ***
@@ -175,7 +181,8 @@ public class App
          */
 
         // Setting the exceeded threshold value that is being monitored
-        
+
+/*        
         String totalDistance = "213";  // JUST SETTING IT AS A STRING SO CAN SEND IN JMS TEXTMESSAGE TO QUEUE FOR NOW...
 
         // Call the Service that sends the value to the Queue - FOR NOW JUST CREATE A CLASS CALLED MonitorService
@@ -213,8 +220,12 @@ public class App
         System.out.format( "%n%n" );
         System.exit(0);
 
+*/
+
+
 
         // ****** -> TASK EXECUTOR <- LATER THIS WILL BE USED FOR ONE OFF ADD ENTRY ASYNCHONOUSLY TO STRAVA ******
+/*
         SampleThreadExecutor sampleThreadExecutor = (SampleThreadExecutor)context.getBean("sampleThreadExecutor");
         //ThreadPoolTaskExecutor sampleThreadExecutor = (ThreadPoolTaskExecutor)context.getBean("myTaskExecutor");
         // ThreadPoolTaskExecutor
@@ -225,10 +236,12 @@ public class App
         //sampleThreadExecutor.execute( new PrintTask( "Thread1" ) );
         sampleThreadExecutor.executeTask( new PrintTask( "Thread2" ) );
         //sampleThreadExecutor.execute( new PrintTask( "Thread2" ) );
+*/
+
 
 
         // Keep the App going onto the Thread running are finished
-        for (;;) {
+/*        for (;;) {
             int count = sampleThreadExecutor.getNumberOfActiveThreads();
             //int count = sampleThreadExecutor.getActiveCount();
             System.out.println( "The number is Active Threads is: " + count );
@@ -244,15 +257,15 @@ public class App
             }
 
         }
-
+*/
 
 
         
         //Thread.sleep(5000); // Just to give time for the Asynchronous message listener to execute before programme exit...
 
-        System.out.format( "%n%n" );
+        //System.out.format( "%n%n" );
 
-        System.exit(0);
+        //System.exit(0);
 
 
         //AppPropertiesInitialisationService appProp = (AppPropertiesInitialisationService) context.getBean("appPropsInitService");
@@ -267,15 +280,16 @@ public class App
 
 
 
-        
+
+        AuthenticateClientService acs = null;        
 
         // The Properties Checker Failed - This means need to Re-Authenticate and then reset them...
         if ( !result ) {  // ***-- THIS COULD ALSO BE THE RESULT FROM CHECKING IF AN OPTIONAL PROPERTY TYPE WAS SET...
 
-            /*
-            *** NOTE *** WILL BE FORCING THIS ROUTE ENTRY FOR THE PROTOTYPE AS WANT THE USER TO AUTHENTICATE...
-            EITHER WILL BE A DATABASE CHECK INITIALY OR ELSE FOR PROTOTYPE THE USER HAS TO ALWAYS AUTHENTICATE...
-            */
+            
+            // NOTE *** WILL BE FORCING THIS ROUTE ENTRY FOR THE PROTOTYPE AS WANT THE USER TO AUTHENTICATE...
+            // EITHER WILL BE A DATABASE CHECK INITIALY OR ELSE FOR PROTOTYPE THE USER HAS TO ALWAYS AUTHENTICATE...
+            
 
             
             String stravaAuthorisationCode = retrieveStravaAuthorisationCode();
@@ -285,7 +299,8 @@ public class App
             System.out.format( "%n%n" );
 
 
-            AuthenticateClientService acs = (AuthenticateClientService) context.getBean("authenticateClientService");
+            //AuthenticateClientService acs = (AuthenticateClientService) context.getBean("authenticateClientService");
+            acs = (AuthenticateClientService) context.getBean("authenticateClientService");
 
             boolean authenticated = acs.authenticateClient( stravaAuthorisationCode );
             
@@ -324,7 +339,7 @@ public class App
             
                 // *** NOTE - THE CURRENT MENU OPTIONS ARE ALL ---GET--- REQUESTS : FOR PROTOTYPE TYPE WILL BE SIMPLE [GET] REQUESTS SO DONT NEED TO TRACK THAT YET...
 
-                System.exit(0);
+                //System.exit(0);
 
                 // NOTE: Currently it will end within that method as it just prints out the chosen method...
 
@@ -341,12 +356,15 @@ public class App
 
         }
 
+        //System.exit(0);
+
+
 
 //context.registerShutdownHook();
 
 
 
-
+        /*
         System.exit(0);
 
 
@@ -368,9 +386,66 @@ public class App
 
     	//System.exit(0);
 
+        System.out.println("Main method ending now...");
+        int count = sampleThreadExecutor.getNumberOfActiveThreads();
+
+        while ( count > 0 ) {
+            System.out.println("Number of active threads is: " + count);
+            Thread.sleep(500);
+            count = sampleThreadExecutor.getNumberOfActiveThreads();
+        }
+        System.out.println("---> Now the number of active threads is: " + count );
+        //context.close();
+        System.exit(0);
+        */
+
+
+        /*
+        =========================================================================================================
+        PROTOTYPE CODE MENU ENTRY SECTION 
+        1 - Show menu 
+        2 - Retrieve user data
+        3 - Execute manual API entry 
+        4 - Run monitor (either already async or hardcoded to kick off here)
+        5 - Receive monitor feedback in command line
+        6 - Email sent from monitor and user updated in command line also
+        7 - Shutdown container
+        =========================================================================================================
+        */
+
+
+
+
+        boolean stravaEntryCreated = acs.createBikeEntryInStrava();
+
+        if ( stravaEntryCreated ) {
+            System.out.println("Your manually added Bike Ride to Strava has now been uploaded");
+        } else {
+            System.out.println("There was a problem uploading the bike ride data to Strava");
+        }
+
+
+        System.exit(0);
+
+
     }	// End of the static void main() method...
 
 
+
+    /**
+     * Manually Adding A STRAVA Activity
+     * POST https://www.strava.com/api/v3/activities
+     */
+    private static boolean addStravaBikeEntryForToday() {
+
+        // https://www.strava.com/api/v3/activities
+
+        //SEE ABOUT ALLOWING PARAMETERS TO CHOOSE WHICH ACCOUNT TO ADD ENTRY TO ???        
+
+
+        return true;
+
+    }   // End of method addStravaBikeEntryForToday()...
 
 
 
@@ -394,12 +469,42 @@ public class App
         System.out.println( "The Authorisation code will appear in the URL after the &code= section in the URL." ); 
         System.out.println( "Please copy that code and provide it into command prompt that follows." );
 
-        System.out.println( "https://www.strava.com/oauth/authorize?client_id=11430&response_type=code&redirect_uri=http://strava.com/dashboard&approval_prompt=force" );
+        System.out.println( "https://www.strava.com/oauth/authorize?client_id=11430&response_type=code&scope=write&redirect_uri=http://strava.com/dashboard&approval_prompt=force" );
+
+
+
+/*
+
+DECIDE ON WHICH CLIENT ID TO USE FOR THIS --- LOOK AT THE DEFINITION OF THIS AND SEE WHICH ONE MAKES MOST SENSE...CAN USE THE FIREDUPTECH ACCOUNT FOR THE DEMO
+                                                AND FOR ADDING MANUAL API WORKOUTS TO IT...
+
+
+****** NOTE ****** ---> REMOVE THE APPLICATION ENTRY IN THE FIREDUPTECH ACCOUNT (SO GET RID OF THAT CLIENT ID ETC) AND SEND THE ORIGINAL URL TO IT (CLIENT ID 11430)
+                        TO GET AN AUTHORISATION CODE AND THEN SEE WHAT IF ANY ENTRY IS IN THE APPLICATION SECTION OF THAT FIREDUPTECH ACCOUNT THEN AFTER THAT...
+
+*/
+
+
+
+
+//https://www.strava.com/oauth/authorize?client_id=11511&response_type=code&scope=write&redirect_uri=http://strava.com/dashboard&approval_prompt=force
+//https://www.strava.com/oauth/authorize?client_id=11511&response_type=code&redirect_uri=http://localhost&approval_prompt=force   THIS IS THE URL THAT I GET FROM STRAVA SITE TO APPROVE IT...
 
         String authorisationCode = c.readLine( "Please enter the Authorisation Code from the browser URL that Strava provided:" );
 
         //*** NOTE **** - HARDCODED IN THE CODE RETURNED FROM STRAVA - 546e1762ab07cc14532af26485903f6f5cfc6653
-        authorisationCode = "546e1762ab07cc14532af26485903f6f5cfc6653";
+    
+        // fireduptech account code:
+        authorisationCode = "9b2ef165d15359ec325d52fdfa0a1ba6b6ad8f92";   // THIS ALLOWS ACCESS TO THE FIREDUPTECH ACCOUNT
+        
+
+        // Code from the main account app id: 11430
+        //authorisationCode = "bded3c3c5ca512f337777aa766504b0850cb9d27"; // THIS ALLOWS ACCESS TO THE MCCARTHY.RICHARD ACCOUNT
+        // {"message":"Bad Request","errors":[{"resource":"RequestToken","field":"code","code":"invalid"}]}
+
+
+        // THIS CODE WAS FROM URL SENT USING THE APP CODE FROM FIREDUP TECH - DOES NOT CONNECT WHEN GET CODE FROM MY MAIN ACCOUNT, DO NOT KNOW WHY ...
+
 
         System.out.println( "The code you entered is: " + authorisationCode );
 

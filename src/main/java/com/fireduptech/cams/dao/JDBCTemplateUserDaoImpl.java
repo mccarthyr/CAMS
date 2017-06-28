@@ -21,6 +21,7 @@ import com.fireduptech.cams.domain.User;
 public class JDBCTemplateUserDaoImpl implements JDBCTemplateUserDao {
 
 
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 

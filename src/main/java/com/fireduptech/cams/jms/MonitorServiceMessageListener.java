@@ -55,14 +55,14 @@ public class MonitorServiceMessageListener implements MessageListener {
 			System.out.println( this.queueMessage );
 			System.out.format( "%n%n" );
 
-			simpleMailMessage.setTo( "mccarthy.richard@gmail.com" );
+			//simpleMailMessage.setTo( "mccarthy.richard@gmail.com" );
 
 
 		} catch ( JMSException je ) {
 			je.printStackTrace();
 		}
 
-			sendEmail();
+			//sendEmail();
 	}
 
 

@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
 
-
 import com.fireduptech.cams.service.HttpClientService;
 
 import com.fireduptech.cams.domain.StravaAuthenticationResponse;
@@ -51,8 +50,13 @@ public class AuthenticateClientService {
 
     private HttpClientService httpClientService;
 
-    private static final int clientId = 11430;
-    private static final String clientSecret = "0dcc40d724e4ec25f0417b290a3410bf1b1d09fa";
+    //private static final int clientId = 11430;
+    //private static final String clientSecret = "0dcc40d724e4ec25f0417b290a3410bf1b1d09fa";
+
+    // FiredUpTech Account App ID
+    private static final int clientId = 11511;
+    private static final String clientSecret = "5642c456cc8feccf9026a27ed860273eb5fa4ade";
+
 
     private static final String tokenUrl = "https://www.strava.com/oauth/token";
 
@@ -91,6 +95,10 @@ public class AuthenticateClientService {
 
         String response = this.httpClientService.httpPost( tokenUrl, clientId, clientSecret, authorisationCode );
 
+System.out.println("THE RESPONSE IS: -> " + response);
+//YOU CAN GET A RESPONSE LIKE THIS WHEN I SEND THE WRONG CODE OVER FOR THE WRONG CLIENT ID:
+//{"message":"Bad Request","errors":[{"resource":"RequestToken","field":"code","code":"invalid"}]}
+
         if ( response != null && !response.trim().isEmpty() ) {
             extractAuthenticationTokenAndAthleteId( response );
         }
@@ -123,9 +131,37 @@ public class AuthenticateClientService {
         stravaAuthenticationResponse = gson.fromJson( response, StravaAuthenticationResponse.class );
 
         this.athleteId = stravaAuthenticationResponse.getStravaAthlete().getId();
-        authenticationToken = stravaAuthenticationResponse.getAccessToken();
+        this.authenticationToken = stravaAuthenticationResponse.getAccessToken();
 
     }
+
+
+
+
+    // NOTE *** Currently values hardcoded in here for demo ***
+    public boolean createBikeEntryInStrava() throws IOException {
+
+        // URI for POST addition of an activity
+        String apiRequest = "https://www.strava.com/api/v3/activities";
+
+        if ( this.authenticated ) {
+
+            String response = this.httpClientService.httpPostManualBikeRide( apiRequest, this.authenticationToken );
+
+            if ( response != null && !response.trim().isEmpty() ) {
+
+                // Once response is returned true then for a POST entry that is all user needs
+                return true;
+            }
+            // @TODO - Add in Exception management here
+
+        }
+
+        return false;
+    }
+
+
+
 
 
     /**

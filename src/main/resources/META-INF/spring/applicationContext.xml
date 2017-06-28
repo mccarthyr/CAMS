@@ -13,15 +13,20 @@
 
 
 	<!--<context:property-placeholder location="classpath*:META-INF/config/database.properties" />-->
+
 	<context:property-placeholder location="classpath*:META-INF/config/*.properties" />
+
 
 	<context:component-scan base-package="com.fireduptech.cams" />
 
+
 	<jpa:repositories base-package="com.fireduptech.cams" />
+
 
 	<!-- <tx:annotation-driven transaction-manager="transactionManager" /> -->
 
 	<tx:annotation-driven />
+
 
 	<bean id="jmsTxManager" class="org.springframework.jms.connection.JmsTransactionManager" >
 		<property name="connectionFactory" ref="cachingConnectionFactory" />
@@ -31,25 +36,32 @@
 		<constructor-arg ref="entityManagerFactory" />
 	</bean>
 
+
 	<!-- AMQ Broker for configuring embedded ActiveMQ broker called localhost -->
 	<amq:broker>
 		<amq:transportConnectors>
-			<amq:transportConnector uri="tcp://localhost:61616" />
+			<amq:transportConnector uri="tcp://localhost:61616?transport.daemon=true" />
 		</amq:transportConnectors>
 	</amq:broker>
+	<!-- Reference to the '?transport.daemon=true' tcp option above:
+			http://activemq.apache.org/tcp-transport-reference.html -->
+
 
 	<!-- Configuring JMS ConnectionFactory -->
-	<amq:connectionFactory brokerURL="vm://localhost" id="jmsFactory" >
+
+	<amq:connectionFactory brokerURL="vm://localhost" id="jmsFactory">
 		<amq:trustedPackages>
 			<value>com.fireduptech.cams.domain</value>
 		</amq:trustedPackages>
 	</amq:connectionFactory>
 
+
 	<!-- Configuring Spring's CachingConnectionFactory, which is an adapter for the JMS ConnectionFactory.
        For caching instances of JMS Session, MessageProducer and MessageConsumer -->
-	<bean class="org.springframework.jms.connection.CachingConnectionFactory" id="cachingConnectionFactory" >
+	<bean class="org.springframework.jms.connection.CachingConnectionFactory" id="cachingConnectionFactory" destroy-method="destroy">
 		<property name="targetConnectionFactory" ref="jmsFactory" />
 	</bean>
+
 
 	<!-- Configuring JmsTemplate - provides layer of abstraction over JMS API -->
 	<bean class="org.springframework.jms.core.JmsTemplate" id="jmsTemplate" >
@@ -57,8 +69,10 @@
 		<property name="defaultDestination" ref="watchlistDataDestination" />
 	</bean>
 
+
 	<!-- Configuring the AMQ Queue Destination -->
 	<amq:queue id="watchlistDataDestination" physicalName="monitoredDataQueueDestination" />
+
 
 
 	<!-- Configuring Asynchronous receiving of JMS messages using Spring Message Listener Container -->
@@ -72,6 +86,7 @@
 
    <!-- Configuring ThreadPoolExecutor - Explicit definition rather than using <executor> element of 
         Spring's task schema -->
+
    <bean id="myTaskExecutor"  class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" >
    	<property name="corePoolSize" value="5" />
    	<property name="maxPoolSize" value="10" />
@@ -105,12 +120,12 @@
 
 
 
-
 	<!--
 	<bean id="appPropsInitService" class="com.fireduptech.cams.service.AppPropertiesInitialisationService" >
 		<constructor-arg index="0" value="META-INF/config/appConfig.properties" />
 	</bean>
 	-->
+
 
 	<bean id="appPropertiesChecker" class="com.fireduptech.cams.service.AppPropertiesChecker" >
 		<constructor-arg index="0" value="META-INF/config/appConfig.properties" />
@@ -126,19 +141,20 @@
 	</bean>
 
 
-
 	<!-- Configuring a Data Source -->
 	<!-- org.apache.commons.dbcp2.BasicDataSource -->
-	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+	<!--
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
 		<property name="driverClassName" value="${database.driverClassName}" />
 		<property name="url" value="${database.url}" />
 		<property name="username" value="${database.username}" />
 		<property name="password" value="${database.password}" />
-	</bean> -->
+	</bean>
+	-->
 
 	<!-- If using: commons-dbcp2 then can use below definition otherwise if using
 	   	 commons-dbcp then use the above commented out definition -->
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close" >
+<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close" >
 		<property name="driverClassName" value="${database.driverClassName}" />
 		<property name="url" value="${database.url}" />
 		<property name="username" value="${database.username}" />
@@ -169,6 +185,7 @@
  	<prop key="hibernate_show_sql">true</prop>
  	<prop key="hibernate.id.new_generator_mappings">false</prop>
  </util:properties>
+
 
 </beans>
 
